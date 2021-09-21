@@ -1,0 +1,806 @@
+---
+title: "Credit Risk Analysis"
+author: "Zhicong Hu"
+date: 2021-05-04T21:13:14-05:00
+categories: ["R"]
+tags: ["R Markdown", "plot", "regression"]
+
+header-includes: 
+- \usepackage{float}
+---
+
+<script src="ST404 Assignment 3_files/kePrint/kePrint.js"></script>
+<link href="ST404 Assignment 3_files/lightable/lightable.css" rel="stylesheet" />
+
+
+<style type="text/css">
+body, td {
+   font-size: 11px;
+}
+code.r{
+  font-size: 9px;
+}
+pre {
+  font-size: 9px
+}
+</style>
+<div style="page-break-after: always;"></div>
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>The purpose of this report is to study which customers will default on credit card repayment and which customers will repay normally. To analyze the data, we will establish a logistics regression model and make classification prediction. We will predict credit defaults through the use of customer characteristics. Through customer information characteristics, financial institutions are then able to use provided relevant models and effective information to check for default behaviours, thus reducing financial risks.</p>
+</div>
+<div id="the-problem" class="section level1">
+<h1>The Problem</h1>
+<p>Credit Risk, also known as default risk, refers to the possibility that the borrower or counterparty is unwilling or unable to perform the contract conditions for various reasons, which constitutes a default, resulting in losses to the bank or counterparty.</p>
+<p>This is the main risk in the process of bank credit granting, and it is also a common risk in the process of bank credit card approval. The premise of credit card risk assessment is to obtain the credit information of the applicant, evaluate the obtained information of the applicant, quantify its performance ability, and finally assess whether to grant credit. In the past, credit granting to credit card applicants mainly depended on the evaluation of loan officers, and the evaluation results were influenced by subjective factors, or banks set up special credit decision-making committees to comprehensively evaluate applicants. However, the expansion of consumer loans and micro-loans in recent years has made the previous methods of relying on manual credit evaluation have limitations, and the manual evaluation also has some impersonality and incompleteness.</p>
+<p>At present, there are many problems in consumer credit, such as customers are difficult to keep, the loan amount is small, the default rate is high, there is no mortgage guarantee, and adjustment is difficult. It is necessary to cooperate with a more efficient, convenient, accurate, objective and lower cost credit analysis and evaluation scheme. At present, the financial market is facing great uncertainty, and both banks and even all financial institutions and investors are facing the test of huge credit risks. It is an urgent problem for all major financial institutions to establish a sound and effective investor credit evaluation system. Studies have shown that the bank’s profit is closely related to the effectiveness of the credit evaluation model, and every 1% increase in the accuracy of the model, the bank can generate billions of returns. In addition, practical research shows that machine learning plays a positive role in the practice of establishing credit risk assessment model, which not only improves its accuracy but also expands its application scope.</p>
+<p>This paper tries to find a more accurate credit risk assessment system by applying the research concept of machine learning to the establishment of credit risk assessment model for credit card applicants, so as to help relevant financial institutions establish a more complete customer credit risk assessment system. The credit card risk studied in this paper is mainly to predict whether the trustee will have overdue repayment or non-repayment behavior for more than a large amount of time. The traditional credit card risk assessment is mainly through artificial judgment or discriminant analysis. Nowadays, most of the research uses Logistic regression model. This paper will model customers’ credit characteristics and self-information to predict those customers who will repay on time and those who will be in arrears, hoping to provide relevant information for financial institutions to reduce financial risks.</p>
+</div>
+<div id="data-sources" class="section level1">
+<h1>Data Sources</h1>
+<p>Data is extracted from “default of credit card clients Data Set” donated by I-Cheng Yeh and from Dua, D. and Graff, C. (2019). UCI Machine Learning Repository <a href="http://archive.ics.uci.edu/ml" class="uri">http://archive.ics.uci.edu/ml</a> Irvine, CA: University of California, School of Information and Computer Science.</p>
+<p>The variables used in this report include:</p>
+<ul>
+<li><p>Credit limit;</p></li>
+<li><p>Education level;</p></li>
+<li><p>Marital status;</p></li>
+<li><p>Gender;</p></li>
+<li><p>Age in years;</p></li>
+<li><p>The repayment status in date;</p></li>
+<li><p>Amount of bill statement in date;</p></li>
+<li><p>Amount paid in date;</p></li>
+<li><p>Dependent variable: Default payment (0=No,1=Yes)</p></li>
+</ul>
+</div>
+<div id="data-cleaning" class="section level1">
+<h1>Data Cleaning</h1>
+<p>We will first conduct data cleaning before we fit our model for prediction, there are three steps to data cleaning:</p>
+<ol style="list-style-type: decimal">
+<li><p>Missing values treatment</p></li>
+<li><p>Transformations to our variables</p></li>
+<li><p>Checking for correlation between variables</p></li>
+</ol>
+</div>
+<div id="missing-values" class="section level1">
+<h1>Missing values</h1>
+<p>Carry out preliminary data cleaning to see if the training and testing data has any missing values and identify the type of missing values. Since the data came from the same source, we are able to combine both sets of data for missing value analysis.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-2"></span>
+<img src="/post/2021-05-04-r-rmarkdown/ST404%20Assignment%203_files/figure-html/unnamed-chunk-2-1.png" alt="Missing value in each variables" width="60%" />
+<p class="caption">
+Figure 1: Missing value in each variables
+</p>
+</div>
+<p>As we can see from the table above, there are 71 missing values on the variable <strong>EDUCATION</strong>, representing educational level, and 5 missing values on the variable <strong>MARRIAGE</strong>, representing marriage status. Since there are only 5 missing values out of 7067 observations for our <strong>MARRIAGE</strong> variable, missing value data might not be sufficient to do much investigation. Therefore, we will only look into our <strong>EDUCATION</strong> variable and take the same approach for both variables.</p>
+<p>By using Mosaic plots, we will look into the customer characteristics variables such <strong>LIMIT_BAL</strong>, <strong>AGE</strong> and <strong>SEX</strong> against our missing value variable <strong>EDUCATION</strong>. We only picked customer characteristics variables as these are variables that define individual customers and we do not what specific type of customers to be left out of the model.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-3"></span>
+<img src="/post/2021-05-04-r-rmarkdown/ST404%20Assignment%203_files/figure-html/unnamed-chunk-3-1.png" alt="Mosaic Plots for missing value analysis" width="90%" />
+<p class="caption">
+Figure 2: Mosaic Plots for missing value analysis
+</p>
+</div>
+<p>As we can see from the above Mosaic Plots, there are not much differences in the distribution of our customer characteristics variables when comparing observations that have missing <strong>EDUCATION</strong> variable and observations that have not missing <strong>EDUCATION</strong> variable. Therefore, we come into a conclusion that these missing values are Missing Completely at Random (MCAR) and we will just delete them from the our training and testing data sets.</p>
+</div>
+<div id="transformations" class="section level1">
+<h1>Transformations</h1>
+<p>When performing transformations, we will only transform our variables in our training data. As our dependent variable <strong>default</strong> is a binary variable, we will not do any transformations towards it. Looking into our continuous variables, as <strong>BILL_AMT</strong> and <strong>PAY_AMT</strong> variables are split into many sub variables but are very similar, we will only look into one of each.</p>
+<p>After looking into our continuous variable distributions, we conclude that the following transformations would be appropriate:</p>
+<ul>
+<li><p>Log2 Transformations on <strong>LIMIT_BAL</strong> (Skewness reduced from 1.05 to 0.49)</p></li>
+<li><p>Log2+1 Transformations on <strong>PAY_AMT</strong> (Skewness for <strong>PAY_AMT1</strong> reduced from 8.94 to -1.30)</p></li>
+</ul>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-5"></span>
+<img src="/post/2021-05-04-r-rmarkdown/ST404%20Assignment%203_files/figure-html/unnamed-chunk-5-1.png" alt="Density Plots of continuous variables after suggested transformations" width="90%" />
+<p class="caption">
+Figure 3: Density Plots of continuous variables after suggested transformations
+</p>
+</div>
+<p>Looking into our factor variables, there were too many layers in our variable <strong>PAY</strong>, which represents repayment status, and these made the variable hard to interpret. Hence, we decided to conduct the following transformation to our <strong>PAY</strong> variable:</p>
+<ul>
+<li><p>-2,-1,0 becomes 0 which represents repaid</p></li>
+<li><p>1 remains 1 which represents payment delay for one month</p></li>
+<li><p>2 remains 2 which represents payment delay for two months</p></li>
+<li><p>3,4,5,6,7,8,9 becomes 3 which represents payment delay for three months and above</p></li>
+</ul>
+<p>After doing the above simple transformations, we did not make any further changes to our predictor variables as we still wanted to maintain stronger explanatory power for our model but over transforming our predictor variable will make our model harder to interpret.</p>
+</div>
+<div id="correlation" class="section level1">
+<h1>Correlation</h1>
+<p>For continuous variables, we will use Variance Inflation Factor(VIF) to check for correlations. Bear in mind that we are not using VIF as a method of variable selection, variable selection will be something that we will be doing when building our model. In this case, we are only diagnosing multicollinearity between our predictor variables and gathering appropriate conclusions. With variables that are highly correlated and explains the same meanings, we will not include several of these variables in our model as it merely increase the complexitiy of our model but does no good.</p>
+<table class="kable_wrapper table table" style="margin-left: auto; margin-right: auto; margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:unnamed-chunk-7">Table 1: </span>VIF before and after variable selection
+</caption>
+<tbody>
+<tr>
+<td>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+Variable
+</th>
+<th style="text-align:right;">
+Coefficient
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+LIMIT_BAL
+</td>
+<td style="text-align:right;">
+1.0372
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+AGE
+</td>
+<td style="text-align:right;">
+1.0179
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BILL_AMT1
+</td>
+<td style="text-align:right;">
+11.3850
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BILL_AMT2
+</td>
+<td style="text-align:right;">
+17.9410
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BILL_AMT3
+</td>
+<td style="text-align:right;">
+13.7380
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BILL_AMT4
+</td>
+<td style="text-align:right;">
+14.4900
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BILL_AMT5
+</td>
+<td style="text-align:right;">
+15.6800
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BILL_AMT6
+</td>
+<td style="text-align:right;">
+9.4740
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PAY_AMT1
+</td>
+<td style="text-align:right;">
+1.8369
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PAY_AMT2
+</td>
+<td style="text-align:right;">
+2.1053
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PAY_AMT3
+</td>
+<td style="text-align:right;">
+2.0975
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PAY_AMT4
+</td>
+<td style="text-align:right;">
+2.0724
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PAY_AMT5
+</td>
+<td style="text-align:right;">
+2.0673
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PAY_AMT6
+</td>
+<td style="text-align:right;">
+1.8510
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+<td>
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+Variable
+</th>
+<th style="text-align:right;">
+Coefficient
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+LIMIT_BAL
+</td>
+<td style="text-align:right;">
+1.0359
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+AGE
+</td>
+<td style="text-align:right;">
+1.0171
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BILL_AMT1
+</td>
+<td style="text-align:right;">
+2.9482
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BILL_AMT6
+</td>
+<td style="text-align:right;">
+3.1329
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PAY_AMT1
+</td>
+<td style="text-align:right;">
+1.7280
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PAY_AMT2
+</td>
+<td style="text-align:right;">
+1.9270
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PAY_AMT3
+</td>
+<td style="text-align:right;">
+1.9659
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PAY_AMT4
+</td>
+<td style="text-align:right;">
+1.9445
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PAY_AMT5
+</td>
+<td style="text-align:right;">
+1.9664
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PAY_AMT6
+</td>
+<td style="text-align:right;">
+1.8455
+</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<p>After removing the variables <strong>BILL_AMT2</strong>, <strong>BILL_AMT3</strong>, <strong>BILL_AMT4</strong>, <strong>BILL_AMT5</strong>, we can see that all variable have a VIF less than 5, which suggests that the issue of multicollinearity has been improved.</p>
+</div>
+<div id="method" class="section level1">
+<h1>Method</h1>
+<p>In this report, the Logistic regression model will be used for regression analysis, and a prediction classification model will be established. The Logistic regression model is mainly used to analyze the relationship between independent variables and discrete dependent variables.</p>
+<p>Dependent variables are generally classified variables of “0-1” type. In this study, the main research content is personal credit risk evaluation, and the dependent variable y is binary variable with values of 0 and 1 respectively; y=1 represents a customer with default behavior, and y=0 represents a customer without default record. Logistic is essentially a discriminant model based on conditional probability. In actual credit approval classification, a threshold is set for classification, so Logistic regression model can also be regarded as a probability estimation, that is, an estimation of the default probability of the user.</p>
+<p>ROC curve is used to judge the validity of the model, which represents the result combination of multiple confusion matrices. assuming that the threshold definition in the above model is unsuccessful, the prediction results of the model are simply sorted in descending order, and the threshold is defined by each probability value in sequence, so that many confusion matrices can be generated.</p>
+<p>Confusion matrix is the basis of ROC curve drawing, and it is also the most basic, intuitive and simple method to measure the accuracy of classification model. Confusion matrix is to count the number of observed values of the wrong and right classes of the classification model respectively, and then display the results in a table.</p>
+<div id="model-fitting" class="section level2">
+<h2>Model fitting</h2>
+<p>First, we will look at the effectiveness of our continuous variable transformations. We will fit two models, one before transformations and one after transformations, and compare their respective AICs.</p>
+<table class="table table" style="margin-left: auto; margin-right: auto; margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:unnamed-chunk-8">Table 2: </span>AIC before and after transformations
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Transformations
+</th>
+<th style="text-align:right;">
+AIC
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Before
+</td>
+<td style="text-align:right;">
+3580.489
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+After
+</td>
+<td style="text-align:right;">
+3439.412
+</td>
+</tr>
+</tbody>
+</table>
+<p>As we can see from the table above, AIC for our model was lower after our proposed transformation. Hence, we will keep our transformation and go on to build our model. We will start from the full model (all variables are included in the model) and reduce variables until all coefficients of our variables are significant.</p>
+<table class="table table" style="margin-left: auto; margin-right: auto; margin-left: auto; margin-right: auto;">
+<caption>
+<span id="tab:unnamed-chunk-10">Table 3: </span>Model variable coefficients
+</caption>
+<thead>
+<tr>
+<th style="text-align:left;">
+Variable
+</th>
+<th style="text-align:right;">
+Coefficient
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+SEX
+</td>
+<td style="text-align:right;">
+-1.197381
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+AGE
+</td>
+<td style="text-align:right;">
+-0.170410
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PAY_1
+</td>
+<td style="text-align:right;">
+0.009844
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BILL_AMT1
+</td>
+<td style="text-align:right;">
+0.581024
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PAY_AMT1
+</td>
+<td style="text-align:right;">
+2.524044
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PAY_AMT2
+</td>
+<td style="text-align:right;">
+2.560198
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+PAY_AMT5
+</td>
+<td style="text-align:right;">
+0.000003
+</td>
+</tr>
+</tbody>
+</table>
+<p>After our step-by-step variable reduction, our final model has variables <strong>SEX</strong>, <strong>AGE</strong>, <strong>BILL_AMT1</strong>, <strong>PAY_AMT1</strong>, <strong>PAY_AMT2</strong> and <strong>PAY_AMT5</strong>. With only 6 variables, our model is also easy to interpret and have strong explanatory power. Comparing between the coefficients of variables <strong>PAY_AMT</strong>, we can see that recent paid amount are much important while the older ones are less important.</p>
+<p>All of the coefficients of our variables are significant at the level of 0.1 as well. Using ANOVA to compare our initial model (full model) and our final model, we get a p-value of 0.001, which suggest that our changes are not significant and it appropriate that we removed our suggested variables. Furthermore, our selected variable model has a better goodness of fit, and AIC is smaller at 3439.2.</p>
+</div>
+</div>
+<div id="results" class="section level1">
+<h1>Results</h1>
+<div id="model-diagnosis" class="section level2">
+<h2>Model diagnosis</h2>
+<p>Fitting the residual diagram of our model, the student residuals shows that there are some trends in the fitting residual of the model, but the overall fitting is good.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-11"></span>
+<img src="/post/2021-05-04-r-rmarkdown/ST404%20Assignment%203_files/figure-html/unnamed-chunk-11-1.png" alt="Histogram of Predicted value and Students residual" width="60%" />
+<p class="caption">
+Figure 4: Histogram of Predicted value and Students residual
+</p>
+</div>
+<p>We looked into more residual plots such as deviance residual plot and pearson residual plot and they convey similar ideas of trend.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-12"></span>
+<img src="/post/2021-05-04-r-rmarkdown/ST404%20Assignment%203_files/figure-html/unnamed-chunk-12-1.png" alt="Deviance residual and Pearson residual plots" width="60%" />
+<p class="caption">
+Figure 5: Deviance residual and Pearson residual plots
+</p>
+</div>
+<p>Looking into each variables, Added Variable Plots each variable is evenly distributed, and the residual of partial residual graph is evenly distributed on the trend line. All these suggest suitable fit of our model.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-13-1"></span>
+<img src="/post/2021-05-04-r-rmarkdown/ST404%20Assignment%203_files/figure-html/unnamed-chunk-13-1.png" alt="Added-Variables and Component-Residual Plots" width="80%" />
+<p class="caption">
+Figure 6: Added-Variables and Component-Residual Plots
+</p>
+</div>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-13-2"></span>
+<img src="/post/2021-05-04-r-rmarkdown/ST404%20Assignment%203_files/figure-html/unnamed-chunk-13-2.png" alt="Added-Variables and Component-Residual Plots" width="80%" />
+<p class="caption">
+Figure 7: Added-Variables and Component-Residual Plots
+</p>
+</div>
+</div>
+<div id="model-prediction-and-classification" class="section level2">
+<h2>Model prediction and classification</h2>
+<p>The purpose of establishing the model is to use the model to predict and classify credit card customers, and check whether customers have the possibility of default payment by fitting variables. The built model is used for logistics regression classification, and the confusion matrix is obtained by calculation. There are a large number of first-class error data and second-class error data. By selecting getting a loop to find optimal cutoff point for accuracy, we set our cutoff point is finally set at 0.55, so as to get the maximum accuracy. Then the accuracy, false positive rate and false negative rate are calculated, and the accuracy is 88.05%.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-14"></span>
+<img src="/post/2021-05-04-r-rmarkdown/ST404%20Assignment%203_files/figure-html/unnamed-chunk-14-1.png" alt="Boxplot to see probability and classfication" width="60%" />
+<p class="caption">
+Figure 8: Boxplot to see probability and classfication
+</p>
+</div>
+<p>Below is our confusion matrix for when threshold = 0.55.</p>
+<pre><code>##      ypred
+##       FALSE TRUE  Sum
+##   0    1744   16 1760
+##   1     229   62  291
+##   Sum  1973   78 2051</code></pre>
+<p>However, we are not satisfied with this because our false negative is extremely high at 229 predictions, this means that our recall is low at merely 21.3%. High recall in our model is important as we want to be able to identify most or even all customers that will default, as these are customers that will create loss for the credit card company. Therefore, we will try find a suitable threshold that can manage the trade-off between accuracy and recall.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-16"></span>
+<img src="/post/2021-05-04-r-rmarkdown/ST404%20Assignment%203_files/figure-html/unnamed-chunk-16-1.png" alt="Accuracy and Recall trade-off plot" width="80%" />
+<p class="caption">
+Figure 9: Accuracy and Recall trade-off plot
+</p>
+</div>
+<p>Using the graph above, we aim for a recall of above 0.6, which means that our model will be able to identify 60% of the default customers, we set our threshold as 0.146 and we get the following confusion matrix.</p>
+<pre><code>##      ypred
+##       FALSE TRUE  Sum
+##   0    1416  344 1760
+##   1     115  176  291
+##   Sum  1531  520 2051</code></pre>
+<p>With this threshold, our recall is 60.5% and our accuracy is 77.6%. We lost about 10% of our accuracy but we are now able to identify more than 60% of the defaulting customers instead of the initial 20 and I believe that it is a worthy trade-off.</p>
+<p>In order to check the accuracy of classification, we fit the ROC curve. The closer the ROC curve is to the upper left corner, the higher the recall rate of the model. The point on the ROC curve closest to the upper left corner is the best threshold for the least classification errors, and the total number of false positive cases and false negative cases is the least.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-18"></span>
+<img src="/post/2021-05-04-r-rmarkdown/ST404%20Assignment%203_files/figure-html/unnamed-chunk-18-1.png" alt="ROC plots on training and testing data set" width="60%" />
+<p class="caption">
+Figure 10: ROC plots on training and testing data set
+</p>
+</div>
+<p>The ROC for the training set is only for comparison purposes, it is also expected that our AUC for the training set is higher than that of the testing set and our model will be more fitted to our training data. Calculating our AUC, we get AUC = 0.742 with the 95% confidence interval being [0.7367,0.8013]. It can be concluded that AUC is average but definitely not ideal.</p>
+</div>
+</div>
+<div id="limitations" class="section level1">
+<h1>Limitations</h1>
+<p>The first limitations of our model is within the transformations applied to our predictor variables. While applying transformation, even though our predictor variables can become less skew and might lead to better model, the interpretability of our model is reduced in the process. This issue is further enhanced by the fact that we are using Logistic Regression model for prediction. Logistic Regression model, given by their nature of having discrete outcomes, they are less sensitive to skewed predictor variables, therefore, this further reduce the need for transformations.</p>
+<p>In addition, in Logistic Regression, classification is done by manually selecting a threshold. While selected threshold might be good while being used on our training and testing data, it is not guarantee to be the optimal threshold for future data. This might reduce our model’s effectiveness for future data. Instead, we can use more advance models for classification such as Decision Tree, Random Forest or even XGBoost. However, using more advance models can also lead to over-fitting but such issues will not be discussed in the scope of this paper.</p>
+</div>
+<div id="conclusion" class="section level1">
+<h1>Conclusion</h1>
+<p>In this paper, logistics regression is used to build the model, and the risk assessment of credit card applicants is carried out through data mining tools. In the process, the shortcomings of building the model are fully understood, and the model optimization is not good enough, and the prediction accuracy is not high enough. The data predicted by the test set shows that the classification results are not good enough, and the sampling method can be optimized, and stratified sampling and other methods can be considered. From the information of the variables in the article, it can be known that men, who have delayed repayment for more than one month, have a positive impact on default payment, and are more inclined to default payment, but these variables are not enough to build a complete model, so more effective variables can be considered to build a model.
+The credit card risk assessment method constructed in this paper cannot completely cover the credit assessment system, but is only a part of it. With the help of a more complete credit evaluation system, customer information can be obtained more effectively and comprehensively. With the popularization of credit card business and the continuous development of social credit, customer credit evaluation is becoming more and more complicated. At the same time, data mining tools are used more and more frequently, which is more helpful for us to complete the evaluation of customer credit. With the advantage of data mining, we can summarize the habits and laws of customer credit more efficiently, help banks to complete the mining of key elements, and help them to carry out customer credit information verification. At the same time, it also plays a guiding role in further perfecting the establishment of customer credit evaluation system.</p>
+</div>
+<div id="reference" class="section level1">
+<h1>Reference</h1>
+<p>[1]Altman E I .Financial Ratios,Discriminates Analysis and the Prediction of Corporate Bankruptcy[J].Journal of Finance,1968.</p>
+<p>[2]Ausubei and Lawrence M.The Failure of Competition in the Credit Card
+Market[J].The American Economic Review,1991(81):50-81.</p>
+<p>[3]Balse Committee on Banking Supervision.Credit risk modeling:current practices
+and applications,1999.</p>
+<p>[4]Chen T,Guestrin C.XGBoost:A Scalable Tree Boosting System[C]// ACM
+SIGKDD International Conference on Knowledge Discovery and Data Mining.ACM,2016:785-794.</p>
+<p>[5]Jackson J R.Simluation Research on Job Shop Production[J].Naval Res Log
+Quart,1957,4(3):287-295.</p>
+<p>[6]Mays E Handbook of Credit Scoring[M]. Fizroy Dearborn,2004.</p>
+<div style="page-break-after: always;"></div>
+</div>
+<div id="appendix" class="section level1">
+<h1>Appendix</h1>
+<pre class="r"><code>#Load libraries
+library(ggplot2)
+library(rpart)
+library(car)
+library(MASS)
+library(Stat2Data)
+library(plyr)
+library(hnp)
+library(DAAG)
+library(sjPlot)
+library(ROCR)
+library(pROC)
+library(VIM)
+library(ggpubr)
+library(kableExtra)
+library(moments)
+library(yardstick)
+
+#Load data
+CardT &lt;- readRDS(file=&quot;CardT.rds&quot;)
+CardV &lt;- readRDS(file=&quot;CardV.rds&quot;)
+
+#Check for missing values
+allCards = rbind(CardT,CardV)
+aggr(allCards, prop = FALSE, combined = TRUE, numbers = TRUE, srtVars = TRUE, 
+     sortCombs = TRUE, cex.axis = .7, oma = c(8,5,5,2))
+
+#Analysis on missing values
+attach(allCards)
+allCards$EducationNA &lt;- ifelse(is.na(EDUCATION), &quot;Missing&quot;, &quot;Not missing&quot;) 
+allCards$MarriageNA &lt;- ifelse(is.na(MARRIAGE), &quot;Missing&quot;, &quot;Not missing&quot;)
+
+attach(allCards)
+par1&lt;- par(mfrow=c(2,2), mar =c(3,3,3,3))
+boxplot(LIMIT_BAL~EducationNA, col=c(&quot;red&quot;, &quot;light blue&quot;), xlab = &quot;&quot;, ylab=&quot;&quot;) 
+mtext(text = &quot;Education&quot;, side =1, line =2, cex=.7)
+mtext(text = &quot;Credit Limit&quot;, side =2, line =2, cex = .7)
+boxplot(AGE~EducationNA, col=c(&quot;red&quot;, &quot;light blue&quot;), xlab = &quot;&quot;, ylab=&quot;&quot;) 
+mtext(text = &quot;Education&quot;, side =1, line =2, cex=0.7)
+mtext(text = &quot;Age&quot;, side =2, line =2, cex = 0.7)
+mosaicplot(table(EducationNA, SEX), cex.axis = 0.55, col = c(&quot;red&quot;, &quot;light blue&quot;), 
+           main = &quot;&quot;, las=1)
+par(par1)
+
+#Omit missing values
+CardT &lt;- na.omit(CardT)
+CardV &lt;- na.omit(CardV)
+
+#Transform our factor variables into factor
+CardT$SEX&lt;-as.factor(CardT$SEX)
+CardT$EDUCATION&lt;-as.factor(CardT$EDUCATION)
+CardT$MARRIAGE&lt;-as.factor(CardT$MARRIAGE)
+CardT$default&lt;-as.factor(CardT$default)
+CardT$PAY_1&lt;-as.factor(CardT$PAY_1)
+CardT$PAY_2&lt;-as.factor(CardT$PAY_2)
+CardT$PAY_3&lt;-as.factor(CardT$PAY_3)
+CardT$PAY_4&lt;-as.factor(CardT$PAY_4)
+CardT$PAY_5&lt;-as.factor(CardT$PAY_5)
+CardT$PAY_6&lt;-as.factor(CardT$PAY_6)
+
+#Density plots to check for skewness
+LimitBalPlot &lt;- ggplot(data = CardT,aes(log(LIMIT_BAL,2),fill=factor(default))) +
+  geom_density(alpha=.6)
+AgePlot &lt;- ggplot(data = CardT,aes(AGE,fill=factor(default))) +
+  geom_density(alpha=.6)
+BillAmtPlot &lt;- ggplot(data = CardT,aes(BILL_AMT1,fill=factor(default))) +
+  geom_density(alpha=.6)
+PayAmtPlot &lt;- ggplot(data = CardT,aes(log(PAY_AMT1+1,2),fill=factor(default))) +
+  geom_density(alpha=.6)
+
+ggarrange(LimitBalPlot,AgePlot,BillAmtPlot,PayAmtPlot,ncol = 2,nrow = 2)
+
+#Factor transformations
+#For training data
+CardT$PAY_1[CardT$PAY_1==&quot;-1&quot;]&lt;-0
+CardT$PAY_1[CardT$PAY_1==&quot;-2&quot;]&lt;-0
+CardT$PAY_2[CardT$PAY_2==&quot;-1&quot;]&lt;-0
+CardT$PAY_2[CardT$PAY_2==&quot;-2&quot;]&lt;-0
+CardT$PAY_3[CardT$PAY_3==&quot;-1&quot;]&lt;-0
+CardT$PAY_3[CardT$PAY_3==&quot;-2&quot;]&lt;-0
+CardT$PAY_4[CardT$PAY_4==&quot;-1&quot;]&lt;-0
+CardT$PAY_4[CardT$PAY_4==&quot;-2&quot;]&lt;-0
+CardT$PAY_5[CardT$PAY_5==&quot;-1&quot;]&lt;-0
+CardT$PAY_5[CardT$PAY_5==&quot;-2&quot;]&lt;-0
+CardT$PAY_6[CardT$PAY_6==&quot;-1&quot;]&lt;-0
+CardT$PAY_6[CardT$PAY_6==&quot;-2&quot;]&lt;-0
+CardT$PAY_1[CardT$PAY_1==&quot;4&quot;]&lt;-3
+CardT$PAY_1[CardT$PAY_1==&quot;5&quot;]&lt;-3
+CardT$PAY_1[CardT$PAY_1==&quot;6&quot;]&lt;-3
+CardT$PAY_1[CardT$PAY_1==&quot;7&quot;]&lt;-3
+CardT$PAY_1[CardT$PAY_1==&quot;8&quot;]&lt;-3
+
+#For testing data
+CardV$PAY_1[CardV$PAY_1==&quot;-1&quot;]&lt;-0
+CardV$PAY_1[CardV$PAY_1==&quot;-2&quot;]&lt;-0
+CardV$PAY_2[CardV$PAY_2==&quot;-1&quot;]&lt;-0
+CardV$PAY_2[CardV$PAY_2==&quot;-2&quot;]&lt;-0
+CardV$PAY_3[CardV$PAY_3==&quot;-1&quot;]&lt;-0
+CardV$PAY_3[CardV$PAY_3==&quot;-2&quot;]&lt;-0
+CardV$PAY_4[CardV$PAY_4==&quot;-1&quot;]&lt;-0
+CardV$PAY_4[CardV$PAY_4==&quot;-2&quot;]&lt;-0
+CardV$PAY_5[CardV$PAY_5==&quot;-1&quot;]&lt;-0
+CardV$PAY_5[CardV$PAY_5==&quot;-2&quot;]&lt;-0
+CardV$PAY_6[CardV$PAY_6==&quot;-1&quot;]&lt;-0
+CardV$PAY_6[CardV$PAY_6==&quot;-2&quot;]&lt;-0
+CardV$PAY_1[CardV$PAY_1==&quot;4&quot;]&lt;-3
+CardV$PAY_1[CardV$PAY_1==&quot;5&quot;]&lt;-3
+CardV$PAY_1[CardV$PAY_1==&quot;6&quot;]&lt;-3
+CardV$PAY_1[CardV$PAY_1==&quot;7&quot;]&lt;-3
+CardV$PAY_1[CardV$PAY_1==&quot;8&quot;]&lt;-3
+
+#Using VIF to check for correlation
+model1 &lt;- lm(default ~ log(LIMIT_BAL,2) + AGE + BILL_AMT1 + BILL_AMT2 + 
+               BILL_AMT3 + BILL_AMT4 + BILL_AMT5 + BILL_AMT6 + 
+               log(PAY_AMT1+1,2) + log(PAY_AMT2+1,2) + log(PAY_AMT3+1,2) + 
+               log(PAY_AMT4+1,2) + log(PAY_AMT5+1,2) + log(PAY_AMT6+1,2), 
+             data = CardT)
+
+Variable&lt;- c(&quot;LIMIT_BAL&quot;,&quot;AGE&quot;,&quot;BILL_AMT1&quot;,&quot;BILL_AMT2&quot;,&quot;BILL_AMT3&quot;,&quot;BILL_AMT4&quot;,
+             &quot;BILL_AMT5&quot;,&quot;BILL_AMT6&quot;,&quot;PAY_AMT1&quot;,&quot;PAY_AMT2&quot;,&quot;PAY_AMT3&quot;,&quot;PAY_AMT4&quot;,
+             &quot;PAY_AMT5&quot;,&quot;PAY_AMT6&quot;)
+
+Coefficient = c()
+for (i in 1:14) {
+  Coefficient[i] &lt;- round(vif(model1)[i], digits=4)
+}
+df &lt;- data.frame(Variable, Coefficient)
+
+model1 &lt;- lm(default ~ log(LIMIT_BAL,2) + AGE + BILL_AMT1 + BILL_AMT6 + 
+               log(PAY_AMT1+1,2) + log(PAY_AMT2+1,2) + log(PAY_AMT3+1,2) + 
+               log(PAY_AMT4+1,2) + log(PAY_AMT5+1,2) + log(PAY_AMT6+1,2), 
+             data = CardT)
+
+Variable&lt;-c(&quot;LIMIT_BAL&quot;,&quot;AGE&quot;,&quot;BILL_AMT1&quot;,&quot;BILL_AMT6&quot;,&quot;PAY_AMT1&quot;,&quot;PAY_AMT2&quot;,
+            &quot;PAY_AMT3&quot;,&quot;PAY_AMT4&quot;,&quot;PAY_AMT5&quot;,&quot;PAY_AMT6&quot;)
+
+Coefficient = c()
+for (i in 1:10) {
+  Coefficient[i]&lt;-round(vif(model1)[i], digits=4)
+}
+df2&lt;-data.frame(Variable, Coefficient)
+kable(list(df,df2), caption = &quot;VIF before and after variable selection&quot;) %&gt;%
+  kable_styling(position = &quot;center&quot;) %&gt;%
+  kable_styling(latex_options = &quot;HOLD_position&quot;)
+
+#Removing correlated variables
+CardT &lt;- subset(CardT,select=-c(BILL_AMT2,BILL_AMT3,BILL_AMT4,BILL_AMT5))
+
+#Fitting models before and after transformations
+fit0&lt;-glm(formula = default ~ LIMIT_BAL + SEX + AGE + MARRIAGE + PAY_1 + PAY_2 +
+            PAY_3 + PAY_4 + PAY_5 + PAY_6 + BILL_AMT1 + BILL_AMT6 + PAY_AMT1 + 
+            PAY_AMT2 + PAY_AMT3 + PAY_AMT4 + PAY_AMT5 + PAY_AMT6,
+          family = binomial(), data=CardT)
+
+fit1&lt;-glm(formula = default ~ log(LIMIT_BAL,2) + SEX + AGE + MARRIAGE + PAY_1 + 
+            PAY_2 +PAY_3 + PAY_4 + PAY_5 + PAY_6 + BILL_AMT1 + BILL_AMT6 + 
+            log(PAY_AMT1+1,2) + log(PAY_AMT2+1,2) + log(PAY_AMT3+1,2) + 
+            log(PAY_AMT4+1,2) + log(PAY_AMT5+1,2) + log(PAY_AMT6+1,2),
+          family = binomial(), data=CardT)
+
+df0 &lt;- data.frame(c(&quot;Before&quot;,&quot;After&quot;), c(AIC(fit0),AIC(fit1)))
+colnames(df0) &lt;- c(&quot;Transformations&quot;,&quot;AIC&quot;)
+kable(df0, caption = &quot;AIC before and after transformations&quot;) %&gt;%
+  kable_styling(position = &quot;center&quot;) %&gt;%
+  kable_styling(latex_options = &quot;HOLD_position&quot;)
+
+#Fitting our final model
+fit2&lt;-glm(formula = default ~ SEX + AGE + PAY_1 + BILL_AMT1 + log(PAY_AMT1+1,2) + 
+            log(PAY_AMT2+1,2) + log(PAY_AMT5+1,2),
+          family = binomial(), data=CardT)
+summary(fit2)
+Anova(fit2)
+
+anova(fit1,fit2, test=&quot;Chisq&quot;)
+
+#Model results, coefficient of variables
+Variable&lt;-c(&quot;SEX&quot;,&quot;AGE&quot;,&quot;PAY_1&quot;,&quot;BILL_AMT1&quot;,&quot;PAY_AMT1&quot;,&quot;PAY_AMT2&quot;,&quot;PAY_AMT5&quot;)
+Coefficient = c()
+for (i in 1:7){
+  if (coef(fit2)[i]==0) {
+    Coefficient[i] = &quot;·&quot;
+  } else {
+  Coefficient[i] = round(coef(fit2)[i], digits=6)
+  }
+}
+df = data.frame(Variable, Coefficient)
+kable(df, caption = &quot;Model variable coefficients&quot;) %&gt;%
+  kable_styling(position = &quot;center&quot;) %&gt;%
+  kable_styling(latex_options = &quot;HOLD_position&quot;)
+
+#Residual plots for model diagnostics
+par0 &lt;- par(mfrow=c(1,2),mgp=c(1.7,0.5,0),mar=c(3.5,3.5,3,0.5)) 
+pred &lt;- hist(predict(fit2), main = &quot;Histogram of predicted values&quot;, cex.main=0.9,
+             cex.lab=0.9)
+students &lt;- hist(rstudent(fit2), main = &quot;Histogram of students residual plot&quot;, 
+                 cex.main=0.9,cex.lab=0.9)
+par(par0)
+
+par1 &lt;- par(mfrow=c(1,2),mgp=c(1.7,0.5,0),mar=c(3.5,3.5,3,0.5)) 
+hnp(fit2,resid.type=&quot;deviance&quot;,ylab=&quot;Deviance Residuals&quot;)
+hnp(fit2,resid.type=&quot;pearson&quot;, ylab=&quot;Pearson Residuals&quot;)
+par(par1)
+
+par2 &lt;- par(mfrow=c(1,2),mgp=c(1.7,0.5,0),mar=c(3.5,3.5,3,0.5)) 
+avPlots(fit2) #Added Varaible Plots examples
+crPlots(fit2,id=TRUE) #Partial Residual Plots
+par(par2)
+
+#Model Performance
+predicted &lt;- predict(fit2, CardV, type=&#39;response&#39;)
+boxplot(predicted~CardV$default, col=&quot;blue&quot;)
+
+#Confusion matrix for threshold = 0.55
+ypred &lt;- predicted &gt; 0.55
+addmargins(table(CardV$default, ypred))
+
+#Searching for better thresholds
+c = seq(from=0.1, to=0.9, by=0.001)
+accuracy = c()
+recall = c()
+for (i in 1:length(c)){
+  ypred &lt;- predicted &gt; c[i]
+  confusionmatrix &lt;- addmargins(table(CardV$default, ypred))
+  accuracy[i] = (confusionmatrix[1,1]+confusionmatrix[2,2])/confusionmatrix[3,3]
+  recall[i] = (confusionmatrix[2,2]/(confusionmatrix[2,1]+confusionmatrix[2,2]))
+}
+
+df = data.frame(accuracy,recall)
+ggplot(data=df, aes(x=accuracy,y=recall)) +
+  geom_point(color=&#39;darkblue&#39;) +
+  labs(title=&quot;Accuracy - Recall trade-off by threshold&quot;)
+
+
+#Confusion matrix for threshold = 0.146
+ypred &lt;- predicted &gt; 0.146
+addmargins(table(CardV$default, ypred))
+
+#ROC Curve
+par(pty=&quot;s&quot;)
+plot.roc(CardT$default,predict(fit2, CardT, type=&quot;response&quot;),ci=TRUE,
+         of=&quot;thresholds&quot;,ci.type=&quot;shape&quot;,print.auc=TRUE, main=&quot;Both ROC&quot;)
+plot.roc(CardV$default,predict(fit2, CardV, type=&#39;response&#39;),add=TRUE,col=&quot;red&quot;,
+         print.auc=TRUE, print.auc.x=0.5, print.auc.y=0.3,print.auc.col=&quot;red&quot;)
+legend(&quot;bottomright&quot;,legend=c(&quot;Training&quot;,&quot;Test&quot;),col=c(&quot;red&quot;,&quot;black&quot;),lty=c(1,1),
+       inset=c(0.05,0.05))</code></pre>
+</div>

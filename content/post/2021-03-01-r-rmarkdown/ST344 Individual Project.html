@@ -1,0 +1,160 @@
+---
+title: "Analytics on Stop and Search by UK police forces"
+author: "Zhicong Hu"
+date: 2021-03-01T21:13:14-05:00
+categories: ["R"]
+tags: ["R Markdown", "plot", "regression"]
+bibliography: Reference.bib
+
+header-includes: 
+- \usepackage{float}
+---
+
+
+
+
+<style type="text/css">
+body, td {
+   font-size: 11px;
+}
+code.r{
+  font-size: 9px;
+}
+pre {
+  font-size: 9px
+}
+</style>
+<div style="page-break-after: always;"></div>
+<div id="executive-summary" class="section level1">
+<h1>Executive Summary</h1>
+<p>Our research questions of the report are:</p>
+<ol style="list-style-type: decimal">
+<li><p>Does Police forces target on people with Black ethnicity during stop and search?</p></li>
+<li><p>Does Police forces uses harder punishment towards a specific ethnicity after stop and search?</p></li>
+</ol>
+<p>Regarding our first research question:</p>
+<ul>
+<li><p>There are ethnic-specific bias towards people with black ethnicity when deciding on targets to conduct stop and search at all three forces, Gwent, Metropolitan and South Yorkshire.</p></li>
+<li><p>The bias is most apparent in areas that have less black population.</p></li>
+<li><p>This bias has been slow resolving in Metropolitan and South Yorkshire over the years but has been increasing in Gwent.</p></li>
+</ul>
+<p>Regarding our second research question:</p>
+<ul>
+<li><p>There are ethnic-specific bias issues when deciding on whether to make a punishment after stop and search have been conducted at Metropolitan Police.</p></li>
+<li><p>In Metropolitan areas, Mixed ethnicity has the highest percentage of over 30% to receive a punishment while Other ethnicity, including ethnicity such as Arab, has the lowest percentage of less than 20% to receive a punishment.</p></li>
+<li><p>In Metropolitan areas, there is a general trend of lower percentage of punishment made for all ethnicities over the years from October 2017 to October 2020.</p></li>
+<li><p>In the other two areas, Gwent and South Yorkshire, there are no ethnic-specific bias when it comes to deciding on whether to make a punishment after stop and search have been conducted.</p></li>
+</ul>
+<div style="page-break-after: always;"></div>
+</div>
+<div id="research-questions" class="section level1">
+<h1>Research Questions</h1>
+<p>In this report, we aim to investigate bias against specific ethnicities within the following areas:</p>
+<ul>
+<li><p>Gwent Police covered areas, Blaenau Gwent, Caerphilly, Monmouthshire, Newport and Torfaen from <span class="citation">(“MS Windows NT Gwent Police About Us,” <a href="#ref-GwentPolice" role="doc-biblioref">n.d.</a>)</span>.</p></li>
+<li><p>Metropolitan Police covered areas, 32 boroughs within Greater London, excluding the City of London from <span class="citation">(“MS Windows NT Metropolitan Police Jurisdiction,” <a href="#ref-MetropolitanPolice" role="doc-biblioref">n.d.</a>)</span>.</p></li>
+<li><p>South Yorkshire Police covered areas, Barnsley, Doncaster and Rotherham from <span class="citation">(“MS Windows NT South Yorkshire Police Police Area,” <a href="#ref-SouthyorkshirePolice" role="doc-biblioref">n.d.</a>)</span>.</p></li>
+</ul>
+<p>In this report, we aim to answer the following research questions regarding ethical bias during police stop and search.</p>
+<ol style="list-style-type: decimal">
+<li><p>Does Police forces target on people with Black ethnicity during stop and search?</p></li>
+<li><p>Does Police forces uses harder punishment towards a specific ethnicity after stop and search?</p></li>
+</ol>
+</div>
+<div id="statistical-methodology" class="section level1">
+<h1>Statistical Methodology</h1>
+<div id="data-cleaning" class="section level2">
+<h2>Data cleaning</h2>
+<p>First for data cleaning, we will subset the data set to our assigned forces, <strong>gwent</strong>, <strong>metropolitan</strong> and <strong>south-yorkshire</strong>. From our research questions, we are only interested in several variables, <strong>Date</strong>, <strong>Self-defined ethnicity</strong>, <strong>Officer-defined ethnicity</strong>, <strong>Object of search</strong>, <strong>Outcome</strong>, hence we will only look into the missing values for these variables. During this investigation on missing values, we will also split the three forces for separate investigation because missing data are vastly different in each force possibly due to systematic errors. We will first look into missing values in <strong>Self-defined ethnicity</strong> using missing value density plots.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-3"></span>
+<img src="/post/2021-03-01-r-rmarkdown/ST344%20Individual%20Project_files/figure-html/unnamed-chunk-3-1.png" alt="The distributon of missing and non-missing values of Officer-defined Ethnicity by date" width="40%" />
+<p class="caption">
+Figure 1: The distributon of missing and non-missing values of Officer-defined Ethnicity by date
+</p>
+</div>
+<p>As we can see from the plots, with the police force Gwent, all data regarding Officer-defined ethnicity after March 2019 is missing. This might be due to systematic errors where the police force no longer records this. With the police force Metropolitan, the density plot for missing values and non-missing values seems to overlap, this can mean that these values are missing completely at random (MCAR). With the police force South Yorkshire, there is a big discrepancy in missing values from October 2017 to March 2018 but after which the missing values seems to be MCAR as well.</p>
+<p>In conclusion, we decide to remove all missing values as interpolating them might lead to inaccurate data. In this case, we can only investigate 18 months of data for Gwent instead of 36 months like the rest and we need be more aware of the time from Oct2017 to Mar2018 for South Yorkshire. After similar missing value investigation on other variables, we decide to remove all missing values of our relevant variables in each part of our report.</p>
+</div>
+<div id="investigation-on-percentage-of-stop-and-search-on-people-with-black-ethnicity" class="section level2">
+<h2>Investigation on percentage of stop and search on people with black ethnicity</h2>
+<p>To investigate the whether if there is bias against people with black ethnicity, we need to find the percentage of stop and search on people with black ethnicity. To further investigate, we should compare the percentage of stop and search and the percentage of the population of that ethnicity to see if there is bias. In this part of the investigation, we chose the variable <strong>Officer-defined ethnicity</strong> as we are interest in ethnic-specific bias when deciding whether to stop and search and self-defined ethnicity is not yet known. Hence, <strong>Officer-defined ethnicity</strong> tells us whether the police forces tend to search on people of black ethnicity more.</p>
+<p>To find percentage of population of specific ethnicities, we got our data from <span class="citation">(“MS Windows NT Stop and Search Data Section 8,” <a href="#ref-stopnsearchdata" role="doc-biblioref">n.d.</a>)</span>. We use the data to find the percentage of people with black ethnicity in the entire population within the police force areas. Using this data, we are aware that the percentage of black population did not change during the 3 years of our investigation but this is valid as population usually do not change very frequently.</p>
+<p>With these data, we will plot to see the percentage of stop and search on people with black ethnicity and the percentage of people with black ethnicity in the population. The black line represents the percentage of people with black ethnicity in the population while the colored points and lines represent the percentage of stop and search on people with black ethnicity over time. As previously mentioned, the black line for all three plots are horizontal lines as the percentage of people with black ethnicity in the population did not change from Oct2017 to Nov2017.</p>
+<div id="graphs-on-percentage-of-stop-and-search-on-people-with-black-ethnicity" class="section level3">
+<h3>Graphs on percentage of stop and search on people with black ethnicity</h3>
+<p>The graph below shows the result for the Gwent Police areas.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-6"></span>
+<img src="/post/2021-03-01-r-rmarkdown/ST344%20Individual%20Project_files/figure-html/unnamed-chunk-6-1.png" alt="Percentage of stop and search by Gwent on Black from Oct2017 till Mar2019" width="40%" />
+<p class="caption">
+Figure 2: Percentage of stop and search by Gwent on Black from Oct2017 till Mar2019
+</p>
+</div>
+<p>As mentioned previously, for Gwent Police, they stopped recording the variable <strong>Officer-defined ethnicity</strong> after March 2019, hence our graph shows only data until March 2019.</p>
+<p>We fitted a linear model to the percentage of stop and search on people with black ethnicity with months. This shows us how ethnic-specific bias changes overtime. The percentage of people with black ethnicity in the population is 0.5522285. The intercept of the model is 0.8436777 and the coefficient for months is 0.2932891. From the graph and our linear model, we can deduce that Gwent Police areas are areas with majority of the population being non-Black. However, the percentage of stop and search on black people is greater than the percentage of black people in the population. Furthermore, the percentage is increasing with 0.2932891 each month. This represents ethnic-specific bias towards the black ethnicity in the areas.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-7"></span>
+<img src="/post/2021-03-01-r-rmarkdown/ST344%20Individual%20Project_files/figure-html/unnamed-chunk-7-1.png" alt="Percentage of stop and search by Metropolitan and South Yorkshire on Black from Oct2017 till Oct2020" width="70%" />
+<p class="caption">
+Figure 3: Percentage of stop and search by Metropolitan and South Yorkshire on Black from Oct2017 till Oct2020
+</p>
+</div>
+<p>The percentage of people with black ethnicity in the population is 13.3280867. The intercept of the model is 43.3664136 and the coefficient for months is -0.1397591. From our model and the graph, we can still deduce that there are ethical bias during stop and search towards people with black ethnicity but with every month, it is decreasing by -0.1397591. This means that in the Metropolitan Police areas, the problem of ethical bias are slowing being resolve. However, it is worth mentioning that there seems to be a cyclic relation where the percentage of stop and search on people with black ethnicity increasing every month and peaks at the July of every year, it then falls sharply in August.</p>
+<p>For the South Yorkshire Police areas, we see a very interesting sharp drop in the percentage of stop and search on people with black ethnicity. This happened on April 2018, which is also the time where there was a shape drop in the number of missing data on <strong>Officer-defined ethnicity</strong>. These two drops can have relationships that are worthy of further investigations.</p>
+<p>In responds to the sharp drop, we decided to fit two separate linear models to percentage of stop and search on people with black ethnicity with months.</p>
+<ul>
+<li><p>In the first six months, the intercept of the model is 50.9831903 and the coefficient for months is -2.3129306.</p></li>
+<li><p>After the first six months, the intercept of the model is 10.9656657 and the coefficient for months is -0.1152673.</p></li>
+</ul>
+<p>Due to the issue of missing values, we would ignore the data of the first six months. From our model and the graph, we can still deduce that there are major ethical bias during stop and search towards people with black ethnicity. The percentage of stop and search on black people are almost 5 times the percentage of black population in these areas. However, the bias seems to be slowly resolving with the percentage dropping by -0.1152673 every month.</p>
+</div>
+<div id="conclusion" class="section level3">
+<h3>Conclusion</h3>
+<p>Generally, we can see that there are ethical bias towards people with black ethnicity during stop and search missions. However, it is less of an issue at places that with higher percentage of black population. In Metropolitan and South Yorkshire, the bias is slowly being resolved with less percentage of stop and search on the black population overtime. On the other hand, the bias is increasing rapidly in Gwent until March 2019 but our available data stops there, whether it is still an issue requires further investigation.</p>
+</div>
+</div>
+<div id="investigation-on-severity-of-punishment-after-stop-and-search-on-people-different-ethnicity" class="section level2">
+<h2>Investigation on severity of punishment after stop and search on people different ethnicity</h2>
+<p>To investigate the whether if there is bias any ethnicity, we need to find the percentage of punishment after stop and search. In this part of the investigation, we chose the variable <strong>Self-defined ethnicity</strong> as we are interest in ethnic-specific bias after stop and search and after self-defined ethnicity declared. Hence, <strong>Self-defined ethnicity</strong> tells us whether the police forces tend to punish more people of any ethnicity. In this investigation we use “ONS 2001 5+1” as our standard ethnic groups from <span class="citation">(“MS Windows NT Ethnic Group, National Identity and Religion Section 4,” <a href="#ref-ethicalgroup" role="doc-biblioref">n.d.</a>)</span>. In the data, before 2018, “Nothing found - no further action” and after 2018, “A no further action disposal” means the same thing from <span class="citation">(“MS Windows NT Acro Criminal Records Office Explanation of Terms,” <a href="#ref-meaningdisposal" role="doc-biblioref">n.d.</a>)</span>. This means no punishment is made while the rest indicates where a punishment was made.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-10"></span>
+<img src="/post/2021-03-01-r-rmarkdown/ST344%20Individual%20Project_files/figure-html/unnamed-chunk-10-1.png" alt="Percentage of punishment by Gwent and South Yorkshire from Oct2017 till Oct2020" width="50%" />
+<p class="caption">
+Figure 4: Percentage of punishment by Gwent and South Yorkshire from Oct2017 till Oct2020
+</p>
+</div>
+<p>In Metropolitan Police areas, there are clearly three classes of ethnicity bias when it comes to percentage of punishment after stop and search is conducted. The highest percentage of punishment being on Mixed ethnicity with almost higher than 30% for every months from Oct2017 to Oct2020. After which, Asian, Black and White have similar percentage of punishment of between 20% to 30% for the same period. Lastly, Other ethnicity that includes ethnicity such as Arab has the lowest percentage of punishment of lower than 20% ever since Sep2019. There is a general trend to note where the percentage of punishment has been dropping for all ethnicities for these three years. This can be because of less crimes or increasing umber of stop and search conducted.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:unnamed-chunk-11"></span>
+<img src="/post/2021-03-01-r-rmarkdown/ST344%20Individual%20Project_files/figure-html/unnamed-chunk-11-1.png" alt="Percentage of punishment by Gwent and South Yorkshire from Oct2017 till Oct2020" width="70%" />
+<p class="caption">
+Figure 5: Percentage of punishment by Gwent and South Yorkshire from Oct2017 till Oct2020
+</p>
+</div>
+<p>On the other hand, we can see that in Gwent and South Yorkshire, there are generally very no ethical bias when it comes to punishment made after stop and search. Every ethnicity has a very close percentage of punishment after stop and search is conducted. It is harder to reach a conclusion for Gwent due to the smaller number of data.</p>
+</div>
+<div id="limitations" class="section level2">
+<h2>Limitations</h2>
+<p>There are limitation to our report’s investigation methods. First, there were many missing data in the raw data that we decided to just remove instead of refilling This can lead to loss in information in the data. Secondly, there are other variables that we are unable to capture in our data. For example, it is possible that people of a specific ethnicity is usually active at times where police conducts stop and search, this results in higher percentage of being stop and search but does not mean ethnic-specfic bias.</p>
+<div style="page-break-after: always;"></div>
+</div>
+</div>
+<div id="references" class="section level1 unnumbered">
+<h1>References</h1>
+<div id="refs" class="references">
+<div id="ref-meaningdisposal">
+<p>“MS Windows NT Acro Criminal Records Office Explanation of Terms.” n.d. <a href="https://www.acro.police.uk/Explanation-of-Terms">https://www.acro.police.uk/Explanation-of-Terms</a>.</p>
+</div>
+<div id="ref-ethicalgroup">
+<p>“MS Windows NT Ethnic Group, National Identity and Religion Section 4.” n.d. <a href="https://www.ons.gov.uk/methodology/classificationsandstandards/measuringequality/ethnicgroupnationalidentityandreligion">https://www.ons.gov.uk/methodology/classificationsandstandards/measuringequality/ethnicgroupnationalidentityandreligion</a>.</p>
+</div>
+<div id="ref-GwentPolice">
+<p>“MS Windows NT Gwent Police About Us.” n.d. <a href="https://www.gwent.police.uk/police-forces/gwent-police/areas/about-us/about-us/">https://www.gwent.police.uk/police-forces/gwent-police/areas/about-us/about-us/</a>.</p>
+</div>
+<div id="ref-MetropolitanPolice">
+<p>“MS Windows NT Metropolitan Police Jurisdiction.” n.d. <a href="https://www.met.police.uk/police-forces/metropolitan-police/areas/about-us/about-the-met/jurisdiction/">https://www.met.police.uk/police-forces/metropolitan-police/areas/about-us/about-the-met/jurisdiction/</a>.</p>
+</div>
+<div id="ref-SouthyorkshirePolice">
+<p>“MS Windows NT South Yorkshire Police Police Area.” n.d. <a href="https://en.wikipedia.org/wiki/South_Yorkshire_Police#Police_area">https://en.wikipedia.org/wiki/South_Yorkshire_Police#Police_area</a>.</p>
+</div>
+<div id="ref-stopnsearchdata">
+<p>“MS Windows NT Stop and Search Data Section 8.” n.d. <a href="https://www.ethnicity-facts-figures.service.gov.uk/crime-justice-and-the-law/policing/stop-and-search/latest#download-the-data">https://www.ethnicity-facts-figures.service.gov.uk/crime-justice-and-the-law/policing/stop-and-search/latest#download-the-data</a>.</p>
+</div>
+</div>
+</div>

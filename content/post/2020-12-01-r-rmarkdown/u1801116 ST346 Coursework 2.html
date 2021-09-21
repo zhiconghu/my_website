@@ -1,0 +1,228 @@
+---
+title: "Generalized Linear Model for Classification and Regression Coursework 2"
+author: "Zhicong Hu"
+date: 2020-12-01T21:13:14-05:00
+categories: ["R"]
+tags: ["R Markdown", "plot", "regression"]
+---
+
+
+
+<div id="a" class="section level1">
+<h1>1(a)</h1>
+<p>Load data courseworkData2.rda.</p>
+<pre class="r"><code>library(here)</code></pre>
+<pre><code>## here() starts at /Users/zhiconghu/Desktop/LBS/AM01/my_website/my_website</code></pre>
+<pre class="r"><code>load(here::here(&quot;data&quot;,&quot;courseworkData2.rda&quot;))</code></pre>
+<p>Fit a null and max Poisson regression model with total number of damage incidents as the outcome. Then, based on AIC, find the best model and look at the model.</p>
+<pre class="r"><code>glm.out1 &lt;- glm(incidents ~ 1 + offset(log(service)), family=poisson(), 
+                data=ships)
+glm.out2 &lt;- glm(incidents ~ (type + year + period)^2 + offset(log(service)), 
+                family=poisson(), data=ships)
+step(glm.out1, direction=&quot;both&quot;, 
+     scope=list(&quot;lower&quot;=glm.out1, &quot;upper&quot;=glm.out2))
+glm.out3 &lt;- glm(incidents ~ year + type + period + year:type + 
+                offset(log(service)), family=poisson(), 
+                data=ships)
+summary(glm.out3)</code></pre>
+<p>However, this model is clearly inappropriate. Based on AIC, we look at the next best model.</p>
+<pre class="r"><code>glm.out4 &lt;- glm(incidents ~ year + type + period + offset(log(service)), 
+                family=poisson(), data=ships)
+summary(glm.out4)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = incidents ~ year + type + period + offset(log(service)), 
+##     family = poisson(), data = ships)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.6768  -0.8293  -0.4370   0.5058   2.7912  
+## 
+## Coefficients:
+##               Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)   -6.40590    0.21744 -29.460  &lt; 2e-16 ***
+## year1965-69    0.69714    0.14964   4.659 3.18e-06 ***
+## year1970-74    0.81843    0.16977   4.821 1.43e-06 ***
+## year1975-79    0.45343    0.23317   1.945  0.05182 .  
+## typeB         -0.54334    0.17759  -3.060  0.00222 ** 
+## typeC         -0.68740    0.32904  -2.089  0.03670 *  
+## typeD         -0.07596    0.29058  -0.261  0.79377    
+## typeE          0.32558    0.23588   1.380  0.16750    
+## period1975-79  0.38447    0.11827   3.251  0.00115 ** 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for poisson family taken to be 1)
+## 
+##     Null deviance: 146.328  on 33  degrees of freedom
+## Residual deviance:  38.695  on 25  degrees of freedom
+##   (6 observations deleted due to missingness)
+## AIC: 154.56
+## 
+## Number of Fisher Scoring iterations: 5</code></pre>
+<p>Hence, glm.out4 is our final model.</p>
+</div>
+<div id="b" class="section level1">
+<h1>1(b)</h1>
+<p>Look at the summary of the model, we can see that a ship of type E, constructed on year 1970 to year 1974 and have period of operation between 1975 to 1979 have the highest risk of damage.</p>
+</div>
+<div id="c" class="section level1">
+<h1>1(c)</h1>
+<p>Extracting coefficients from the summary of the model glm.out4.</p>
+<pre class="r"><code>expected = exp(summary(glm.out4)$coefficients[&quot;(Intercept)&quot;,&quot;Estimate&quot;] + 
+               summary(glm.out4)$coefficients[&quot;typeE&quot;,&quot;Estimate&quot;] + 
+               summary(glm.out4)$coefficients[&quot;year1970-74&quot;,&quot;Estimate&quot;] +
+               summary(glm.out4)$coefficients[&quot;period1975-79&quot;,&quot;Estimate&quot;])*
+  3353*(1/5)
+expected</code></pre>
+<pre><code>## [1] 5.107675</code></pre>
+<p>The expected number of damage incidents in twelve months for the class of shipping at 1(b) is <code>5.1076748</code>.</p>
+</div>
+<div id="a-1" class="section level1">
+<h1>2(a)</h1>
+<p><strong>Exponential Dispersion Model</strong>: Binomial</p>
+<p><strong>Link function</strong>: Logit</p>
+<p><strong>Outcome variable</strong>: Number of school leavers who have a place at university or other higher education institute divided by total number of school leavers</p>
+<p><strong>Predictor variable</strong>: age, gender and smoking status</p>
+</div>
+<div id="b-1" class="section level1">
+<h1>2(b)</h1>
+<p><strong>Exponential Dispersion Model</strong>: Normal</p>
+<p><strong>Link function</strong>: Identity</p>
+<p><strong>Outcome variable</strong>: change in weights of individual rats after six month separated in two groups</p>
+<p><strong>Predictor variable</strong>: vitamin D intake in factor</p>
+</div>
+<div id="c-1" class="section level1">
+<h1>2(c)</h1>
+<p><strong>Exponential Dispersion Model</strong>: Poisson</p>
+<p><strong>Link function</strong>: Log</p>
+<p><strong>Outcome variable</strong>: log of number of times of break downs divided by number of miles driven</p>
+<p><strong>Predictor variable</strong>: model of the vehicle and number of times that it has been serviced</p>
+</div>
+<div id="a-2" class="section level1">
+<h1>3(a)</h1>
+<p>Add a new column in the data frame that represents the total number of participants for each group.</p>
+<pre class="r"><code>esoph$participants &lt;- esoph$ncases + esoph$ncontrols</code></pre>
+<p>Fit a null and max Binomial regression model with percentage of participants with esophageal cancer as the outcome. Then, based on AIC, find the best model.</p>
+<pre class="r"><code>glm.out5 &lt;- glm(ncases/participants ~ 1, family=binomial(), 
+                weight=participants,data=esoph)
+glm.out6 &lt;- glm(ncases/participants ~ (agegp + alcgp + tobgp)^2, 
+                family=binomial(), weight=participants, data=esoph)
+step(glm.out5, direction=&quot;both&quot;, 
+     scope=list(&quot;lower&quot;=glm.out5, &quot;upper&quot;=glm.out6))</code></pre>
+<p>We now look at the model.</p>
+<pre class="r"><code>glm.out7 &lt;- glm(ncases/participants ~ alcgp + agegp + tobgp, 
+                family=binomial(), weight=participants, 
+                data=esoph)
+summary(glm.out7)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = ncases/participants ~ alcgp + agegp + tobgp, family = binomial(), 
+##     data = esoph, weights = participants)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.9507  -0.7376  -0.2438   0.6130   2.4127  
+## 
+## Coefficients:
+##             Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  -6.8954     1.0859  -6.350 2.16e-10 ***
+## alcgp40-79    1.4346     0.2501   5.737 9.63e-09 ***
+## alcgp80-119   1.9807     0.2848   6.956 3.51e-12 ***
+## alcgp120+     3.6029     0.3850   9.357  &lt; 2e-16 ***
+## agegp35-44    1.9809     1.1041   1.794 0.072786 .  
+## agegp45-54    3.7763     1.0680   3.536 0.000407 ***
+## agegp55-64    4.3352     1.0650   4.070 4.69e-05 ***
+## agegp65-74    4.8964     1.0764   4.549 5.39e-06 ***
+## agegp75+      4.8265     1.1213   4.304 1.67e-05 ***
+## tobgp10-19    0.4381     0.2283   1.919 0.055039 .  
+## tobgp20-29    0.5126     0.2730   1.878 0.060398 .  
+## tobgp30+      1.6410     0.3441   4.769 1.85e-06 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 367.953  on 87  degrees of freedom
+## Residual deviance:  82.337  on 76  degrees of freedom
+## AIC: 221.39
+## 
+## Number of Fisher Scoring iterations: 6</code></pre>
+<p>Hence, glm.out7 is our best model.</p>
+</div>
+<div id="b-2" class="section level1">
+<h1>3(b)</h1>
+<pre class="r"><code>glm.out8 &lt;- glm(ncases/participants ~ as.numeric(alcgp) + agegp + tobgp, 
+                family=binomial(), weight=participants, data=esoph)
+anova(glm.out8, glm.out5, &quot;LRT&quot;)</code></pre>
+<pre><code>## Analysis of Deviance Table
+## 
+## Model 1: ncases/participants ~ as.numeric(alcgp) + agegp + tobgp
+## Model 2: ncases/participants ~ 1
+##   Resid. Df Resid. Dev Df Deviance
+## 1        78      88.24            
+## 2        87     367.95 -9  -279.71</code></pre>
+<pre class="r"><code>glm.out9 &lt;- glm(ncases/participants ~ alcgp + as.numeric(agegp) + tobgp, 
+                family=binomial(), weight=participants, data=esoph)
+anova(glm.out9, glm.out5, &quot;LRT&quot;)</code></pre>
+<pre><code>## Analysis of Deviance Table
+## 
+## Model 1: ncases/participants ~ alcgp + as.numeric(agegp) + tobgp
+## Model 2: ncases/participants ~ 1
+##   Resid. Df Resid. Dev Df Deviance
+## 1        80     101.89            
+## 2        87     367.95 -7  -266.06</code></pre>
+<pre class="r"><code>glm.out10 &lt;- glm(ncases/participants ~ alcgp + agegp + as.numeric(tobgp), 
+                 family=binomial(), weight=participants, data=esoph)
+anova(glm.out10, glm.out5, &quot;LRT&quot;)</code></pre>
+<pre><code>## Analysis of Deviance Table
+## 
+## Model 1: ncases/participants ~ alcgp + agegp + as.numeric(tobgp)
+## Model 2: ncases/participants ~ 1
+##   Resid. Df Resid. Dev Df Deviance
+## 1        78      85.87            
+## 2        87     367.95 -9  -282.09</code></pre>
+<pre class="r"><code>summary(glm.out10)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = ncases/participants ~ alcgp + agegp + as.numeric(tobgp), 
+##     family = binomial(), data = esoph, weights = participants)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -2.2009  -0.7033  -0.1997   0.4880   2.3644  
+## 
+## Coefficients:
+##                   Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)        -7.1682     1.0910  -6.570 5.02e-11 ***
+## alcgp40-79          1.3941     0.2479   5.623 1.88e-08 ***
+## alcgp80-119         1.9701     0.2817   6.993 2.69e-12 ***
+## alcgp120+           3.5715     0.3802   9.393  &lt; 2e-16 ***
+## agegp35-44          1.8180     1.0931   1.663 0.096272 .  
+## agegp45-54          3.6212     1.0545   3.434 0.000595 ***
+## agegp55-64          4.1696     1.0506   3.969 7.23e-05 ***
+## agegp65-74          4.7168     1.0610   4.445 8.77e-06 ***
+## agegp75+            4.6941     1.1089   4.233 2.31e-05 ***
+## as.numeric(tobgp)   0.4322     0.0967   4.470 7.83e-06 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 367.953  on 87  degrees of freedom
+## Residual deviance:  85.866  on 78  degrees of freedom
+## AIC: 220.92
+## 
+## Number of Fisher Scoring iterations: 6</code></pre>
+<p>From the ANOVA tables, we can see that the p-value for <code>glm.out10</code> is 0.17, this means that there is no evidence to reject <code>glm.out10</code> from the null model. The variable <code>tobgp</code> should be a numeric value.</p>
+</div>
+<div id="c-2" class="section level1">
+<h1>3(c)</h1>
+<pre class="r"><code>odds_ratio = exp(summary(glm.out10)$coefficients[&quot;alcgp120+&quot;,&quot;Estimate&quot;])
+odds_ratio</code></pre>
+<pre><code>## [1] 35.57026</code></pre>
+<p>The odds ratio of esophageal cancer for a participant who drinks more than 120g of alcohol/day compared with one who drinks less than 40g of alcohol per day is <code>35.5702575</code>.</p>
+</div>
+<div id="section" class="section level1">
+<h1>4</h1>
+</div>

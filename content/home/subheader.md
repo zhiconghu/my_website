@@ -3,4 +3,4 @@ title: ""
 type: subheader
 ---
 
-Let me tell you something my friend. hope is a dangerous thing. hope can drive a man insane. you [measure](/about) yourself by the people who measure themselves by you. it only took me [six days](/sidebar-right).
+Hi, I am Zhicong Hu and I am currently reading for Masters in Analytics and Management at London Business School. Here's a [Short Biography](/about) about me.

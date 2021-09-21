@@ -1,101 +1,97 @@
 [
     {
         "id": 0,
-        "name": "Sample title - big data solutions",
-        "image": "images/s1.jpg",
-        "url": "#",
+        "name": "LBS Pre Programme Assignment",
+        "image": "images/LFB.jpg",
+        "url": "http://localhost:4321/post/2021-09-19-r-rmarkdown/your-name_pre_programme_assignment/",
         "items": [
             {
-                "name": "Web design",
-                "url": "#"
+                "name": "Report",
+                "url": "http://localhost:4321/post/2021-09-19-r-rmarkdown/your-name_pre_programme_assignment/"
             },
             {
-                "name": "Wordpress",
-                "url": "#"
-            },
-            {
-                "name": "Logotype",
-                "url": "#"
+                "name": "Github",
+                "url": "https://github.com/zhiconghu/am01_homeworks/tree/master/pre_programme_assignment"
             }
         ]
     },
     {
         "id": 1,
-        "name": "Pure ipsum - development services for people",
-        "image": "images/s1.jpg",
-        "url": "#",
+        "name": "UK Police force operation Analysis",
+        "image": "images/ukpolices_stopnsearch.jpg",
+        "url": "http://localhost:4321/post/2021-03-01-r-rmarkdown/st344-individual-project/",
         "items": [
             {
-                "name": "Web design",
-                "url": "#"
+                "name": "Report",
+                "url": "http://localhost:4321/post/2021-03-01-r-rmarkdown/st344-individual-project/"
             },
             {
-                "name": "Wordpress",
-                "url": "#"
+                "name": "Github",
+                "url": "https://github.com/zhiconghu/am01_homeworks/tree/master/ST344%20Individual%20Project"
             }
         ]
     },
     {
         "id": 2,
-        "name": "Lorem studios - interior and patio design",
-        "image": "images/s1.jpg",
-        "url": "#",
+        "name": "Credit Risk Analysis",
+        "image": "images/creditrisk.jpg",
+        "url": "http://localhost:4321/post/2021-05-04-r-rmarkdown/st404-assignment-3/",
         "items": [
             {
-                "name": "Web design",
-                "url": "#"
+                "name": "Report",
+                "url": "http://localhost:4321/post/2021-05-04-r-rmarkdown/st404-assignment-3/"
             },
             {
-                "name": "Logotype",
-                "url": "#"
+                "name": "Github",
+                "url": "https://github.com/zhiconghu/am01_homeworks/tree/master/Individual%20Assessment"
             }
         ]
     },
     {
         "id": 3,
-        "name": "Pure ipsum - development services for people",
-        "image": "images/s1.jpg",
-        "url": "#",
+        "name": "Generalized Linear Model for Classification and Regression Coursework 1",
+        "image": "images/glm2.png",
+        "url": "http://localhost:4321/post/2020-10-27-r-rmarkdown/st346-assessed-coursework-1/",
         "items": [
             {
-                "name": "Web design",
-                "url": "#"
+                "name": "Report",
+                "url": "http://localhost:4321/post/2020-10-27-r-rmarkdown/st346-assessed-coursework-1/"
             },
             {
-                "name": "Wordpress",
-                "url": "#"
+                "name": "Github",
+                "url": "https://github.com/zhiconghu/am01_homeworks/tree/master/Coursework%201"
             }
         ]
     },
     {
         "id": 4,
-        "name": "Lorem studios - interior and patio design",
-        "image": "images/s1.jpg",
-        "url": "#",
+        "name": "USA Crime Analysis",
+        "image": "images/usacrime.jpg",
+        "url": "http://localhost:4321/post/2021-03-26-r-markdown/st404-assignment-2/",
         "items": [
             {
-                "name": "Web design",
-                "url": "#"
+                "name": "Report",
+                "url": "http://localhost:4321/post/2021-03-26-r-markdown/st404-assignment-2/"
             },
             {
-                "name": "Logotype",
-                "url": "#"
+                "name": "Github",
+                "url": "https://github.com/zhiconghu/am01_homeworks/tree/master/ST404%20Assessment%202"
             }
         ]
     },
     {
         "id": 5,
-        "name": "Lorem studios - interior and patio design",
-        "image": "images/s1.jpg",
-        "url": "#",
+        "name": "Generalized Linear Model for Classification and Regression Coursework 2",
+        "image": "images/glm2.png",
+        "url": "http://localhost:4321/post/2020-12-01-r-rmarkdown/u1801116-st346-coursework-2/",
         "items": [
             {
-                "name": "Web design",
-                "url": "#"
+                "name": "Report",
+                "url": "http://localhost:4321/post/2020-12-01-r-rmarkdown/u1801116-st346-coursework-2/"
             },
             {
-                "name": "Logotype",
-                "url": "#"
+                "name": "Github",
+                "url": "https://github.com/zhiconghu/am01_homeworks/tree/master/Coursework%202"
             }
         ]
     }

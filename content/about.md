@@ -5,14 +5,20 @@ type: about
 weight: 10
 ---
 
-Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eveniet, consequuntur eius repellendus eos aliquid molestiae ea laborum ex quibusdam laudantium voluptates placeat consectetur quam aliquam beatae soluta accusantium iusto nihil nesciunt unde veniam magnam repudiandae sapiente.
+**I am Zhicong Hu from China and my career goal is to enter the field of asset management, specifically quantitative investment. I am deeply interested in portfolio risk management and asset allocation.**
 
-![about](../images/mac.jpg)
+![about](../images/about.jpeg)
 
-### Necessitatibus
+### London Business School
 
-Velit, odit, eius, libero unde impedit quaerat dolorem assumenda alias consequuntur optio quae maiores ratione tempore sit aliquid architecto eligendi pariatur ab soluta doloremque dicta aspernatur labore quibusdam dolore corrupti quod inventore. Maiores, repellat, consequuntur eius repellendus eos aliquid molestiae ea laborum ex quibusdam laudantium voluptates placeat consectetur quam aliquam!
+**Reading for Masters in Analytics and Management**
 
-### Fugit, laboriosam
+Relevant Modules: Applied Statistics, Data Science for Business, Decision Analytics and Modelling, Data Management, Machine Learning for Big Data, Strategy, Finance, Marketing, etc.
 
-Eum, quasi, est, vitae, ipsam nobis consectetur ea aspernatur ad eos voluptatibus fugiat nisi perferendis impedit. Quam, nulla, excepturi, voluptate minus illo tenetur sint ab in culpa cumque impedit quibusdam. Saepe, molestias quia voluptatem natus velit fugiat omnis rem eos sapiente quasi quaerat aspernatur quisquam deleniti accusantium laboriosam odio id?
+&nbsp;
+
+### University of Warwick
+
+**BSc Mathematics, Operational Research, Stats, Economics (MORSE)**
+
+Relevant Modules: Stochastic Process, Mathematics of Random Events, Mathematical Statistics, Linear Algebra, Mathematical Analysis, Applied Statistical Modelling, Generalised Linear Models for Regression and Classification
