@@ -1,6 +1,6 @@
 baseURL: https://zhiconghu.netlify.app/
 languageCode: en
-title: Initio - Free, multipurpose html5 template by GetTemplate
+title: Zhicong Hu Portfolio Website
 theme: hugo-initio
 params:
   DateForm: September 19, 2021
